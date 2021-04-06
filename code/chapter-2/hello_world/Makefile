@@ -1,18 +1,22 @@
+KERNEL_SRC=/home/share/github/runninglinuxkernel_5.0
+
 CLANG = clang
 
+#最终生成monitor-exec文件，用于在用户态加载bpf程序到内核态运行
 EXECABLE = monitor-exec
 
+#在内核态运行的elf格式的bpf程序
 BPFCODE = bpf_program
 
-BPFTOOLS = /kernel-src/samples/bpf
+BPFTOOLS = $(KERNEL_SRC)/samples/bpf
 BPFLOADER = $(BPFTOOLS)/bpf_load.c
 
-CCINCLUDE += -I/kernel-src/tools/testing/selftests/bpf
+CCINCLUDE += -I/$(KERNEL_SRC)/tools/testing/selftests/bpf
 
-LOADINCLUDE += -I/kernel-src/samples/bpf
-LOADINCLUDE += -I/kernel-src/tools/lib
-LOADINCLUDE += -I/kernel-src/tools/perf
-LOADINCLUDE += -I/kernel-src/tools/include
+LOADINCLUDE += -I/$(KERNEL_SRC)/samples/bpf
+LOADINCLUDE += -I/$(KERNEL_SRC)/tools/lib
+LOADINCLUDE += -I/$(KERNEL_SRC)/tools/perf
+LOADINCLUDE += -I/$(KERNEL_SRC)/tools/include
 LIBRARY_PATH = -L/usr/local/lib64
 BPFSO = -lbpf
 
@@ -30,9 +34,10 @@ BPFSO = -lbpf
 # See more context at:
 # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=06f84d1989b7e58d56fa2e448664585749d41221
 # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fce9501aec6bdda45ef3a5e365a5e0de7de7fe2d
-CFLAGS += $(shell grep -q "define HAVE_ATTR_TEST 1" /kernel-src/tools/perf/perf-sys.h \
+CFLAGS += $(shell grep -q "define HAVE_ATTR_TEST 1" $(KERNEL_SRC)/tools/perf/perf-sys.h \
                   && echo "-DHAVE_ATTR_TEST=0")
 
+#是伪目标，并不代表真正的文件
 .PHONY: clean $(CLANG) bpfload build
 
 clean:
